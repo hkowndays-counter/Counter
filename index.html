@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OWNDAYS 統計｜輕量收藏夾安裝</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f4f7f2;color:#173f34;font:15px/1.8 Arial,"Microsoft JhengHei",sans-serif}.wrap{max-width:850px;margin:auto;padding:30px 24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d6e2d7;padding-bottom:16px}.logo{font-size:21px;font-weight:700}.tag{font-size:12px;border:1px solid #bed2c2;border-radius:999px;padding:3px 11px}h1{font-size:31px;line-height:1.4;margin:25px 0 9px}h2{font-size:19px;margin:27px 0 10px}.muted{color:#65786c}.install{margin:24px 0;background:#fff;border:1px dashed #8eb69a;border-radius:14px;padding:27px;text-align:center}.bookmark{display:inline-block;background:#195f48;color:#fff;font-size:18px;font-weight:700;padding:12px 26px;border-radius:9px;text-decoration:none;box-shadow:0 5px 14px #195f4825}.bookmark.disabled{opacity:.45;cursor:not-allowed}.button{font:inherit;cursor:pointer;border:1px solid #9db9a5;border-radius:8px;background:#fff;color:#184c3a;padding:8px 14px}.primary{background:#195f48;color:#fff;border-color:#195f48}.row{display:flex;gap:8px;align-items:center}.row input{flex:1;min-width:0;border:1px solid #afc6b5;border-radius:8px;padding:10px 12px;font:13px/1.4 monospace}.status{border-radius:9px;padding:11px 14px;background:#e5efe2}.warn{background:#fff0d9;border-left:3px solid #bd7b27;color:#704c1c;padding:13px 16px}.card{background:#fff;border:1px solid #d8e5d9;border-radius:11px;padding:16px 18px}ol{padding-left:22px}li{margin:8px 0}code,kbd{font-size:12px;background:#e6ece3;padding:3px 6px;border-radius:4px}details{margin:20px 0;border-top:1px solid #d5e2d7;padding-top:14px}summary{cursor:pointer;font-weight:700}textarea{width:100%;height:105px;border:1px solid #b9cdbd;border-radius:8px;padding:10px;font:11px/1.55 monospace}footer{margin-top:30px;border-top:1px solid #d5e2d7;padding-top:17px;color:#728077;font-size:12px}@media(max-width:600px){.wrap{padding:22px 17px}h1{font-size:26px}.row{display:block}.row input,.row button{width:100%;margin-top:7px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header><div class="logo">OWNDAYS · 統計</div><span class="tag">外部輕量版 1.0 · 核心 1.10</span></header>
+    <h1>一個收藏夾，自動載入最新版統計工具。</h1>
+    <p class="muted">同事照常喺 Front2 自行輸入店舖番號及登入密碼；輕量收藏夾只從固定 HTTPS 網址載入 <code>counter.js</code>。</p>
+
+    <section class="install">
+      <a id="bookmark" class="bookmark disabled" draggable="true">OWNDAYS 統計－外部版</a>
+      <p>將按鈕拖到收藏夾列。日後只需更新外部 <code>counter.js</code>，毋須重新安裝收藏夾。</p>
+      <button id="download" class="button primary" type="button" disabled>下載收藏夾匯入檔</button>
+    </section>
+
+    <h2>外部程式網址</h2>
+    <div class="row">
+      <input id="scriptUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://你的網址/counter.js" aria-label="counter.js HTTPS 網址">
+      <button id="apply" class="button" type="button">套用網址</button>
+    </div>
+    <p id="hostStatus" class="status" role="status">正在檢查安裝頁網址…</p>
+
+    <h2>使用方法</h2>
+    <ol>
+      <li>先將本資料夾完整部署到支援 HTTPS 嘅靜態網站；<code>index.html</code> 同 <code>counter.js</code> 必須放喺同一層。</li>
+      <li>用部署後嘅 HTTPS 網址開啟本頁，程式網址會自動填好。</li>
+      <li>將「OWNDAYS 統計－外部版」拖到門市瀏覽器收藏夾列，或者下載匯入檔。</li>
+      <li>同事照常登入 Front2、確認正確分店及今日開單日期，再按收藏夾。</li>
+    </ol>
+
+    <div class="card">
+      <strong>收藏夾會做乜？</strong>
+      <p>先確認目前係 Front2 當日列表，再載入你指定嘅 <code>counter.js</code>。載入失敗或超過 15 秒會顯示提示；不會讀取或保存密碼。</p>
+    </div>
+    <p class="warn">只可填入你自己部署及信任嘅 HTTPS 程式網址。外部 JavaScript 會在 Front2 頁面執行，因此唔應使用陌生人提供嘅網址。現有收藏夾版 1.10 請保留作後備。</p>
+
+    <details>
+      <summary>手動設定收藏夾網址</summary>
+      <p>先套用有效 HTTPS 網址，再複製以下完整內容到收藏夾網址欄。</p>
+      <button id="copy" class="button" type="button" disabled>複製完整收藏夾網址</button>
+      <textarea id="code" readonly aria-label="完整收藏夾網址"></textarea>
+      <p id="message" role="status"></p>
+    </details>
+
+    <footer>外部輕量版只改變程式載入方式；統計規則沿用收藏夾版 1.10。</footer>
+  </main>
+
+  <script>
+    function loadOwnDaysCounter(counterUrl){
+      if(location.origin!=='https://staging.front.owndays.net'||!/^\/front_app\/build\/queue\/?$/.test(location.pathname)){
+        alert('請先照常登入 OWNDAYS，開啟「當日列表」，再按「OWNDAYS 統計－外部版」。');
+        return;
+      }
+      const loadingId='owndays-external-counter-loader-v1';
+      if(document.getElementById(loadingId)){
+        alert('統計工具正在載入，請稍候。');
+        return;
+      }
+      const script=document.createElement('script');
+      script.id=loadingId;
+      script.referrerPolicy='no-referrer';
+      script.src=counterUrl+(counterUrl.includes('?')?'&':'?')+'load='+Date.now();
+      let finished=false;
+      const timer=setTimeout(()=>{
+        if(finished)return;
+        finished=true;
+        script.remove();
+        alert('外部統計工具載入逾時。請檢查網絡或改用收藏夾版 1.10。');
+      },15000);
+      script.onload=()=>{
+        if(finished)return;
+        finished=true;
+        clearTimeout(timer);
+        script.remove();
+        setTimeout(()=>{
+          if(!document.getElementById('owndays-local-counter-v1')){
+            alert('外部程式已載入，但統計面板未出現。請改用收藏夾版 1.10，並記錄外部程式版本。');
+          }
+        },100);
+      };
+      script.onerror=()=>{
+        if(finished)return;
+        finished=true;
+        clearTimeout(timer);
+        script.remove();
+        alert('未能載入外部統計工具。請檢查外部網址、公司網絡或瀏覽器政策；亦可改用收藏夾版 1.10。');
+      };
+      (document.head||document.documentElement).appendChild(script);
+    }
+
+    const input=document.getElementById('scriptUrl');
+    const bookmark=document.getElementById('bookmark');
+    const download=document.getElementById('download');
+    const copy=document.getElementById('copy');
+    const code=document.getElementById('code');
+    const hostStatus=document.getElementById('hostStatus');
+    const message=document.getElementById('message');
+    let currentBookmarklet='';
+
+    function makeBookmarklet(url){
+      return 'javascript:('+loadOwnDaysCounter.toString()+')('+JSON.stringify(url)+');';
+    }
+    function validHttps(url){
+      try{const parsed=new URL(url);return parsed.protocol==='https:'&&/\/counter\.js(?:$|[?#])/.test(parsed.pathname+parsed.search+parsed.hash)}
+      catch{return false}
+    }
+    function applyUrl(){
+      const url=input.value.trim();
+      if(!validHttps(url)){
+        currentBookmarklet='';
+        bookmark.removeAttribute('href');
+        bookmark.classList.add('disabled');
+        download.disabled=true;copy.disabled=true;code.value='';
+        hostStatus.textContent='請輸入以 HTTPS 開頭、指向 counter.js 嘅完整網址。';
+        return;
+      }
+      currentBookmarklet=makeBookmarklet(url);
+      bookmark.href=currentBookmarklet;
+      bookmark.classList.remove('disabled');
+      download.disabled=false;copy.disabled=false;code.value=currentBookmarklet;
+      hostStatus.textContent='已套用：'+url;
+    }
+
+    try{
+      if(location.protocol==='https:'){
+        input.value=new URL('counter.js',location.href).href;
+        applyUrl();
+      }else{
+        hostStatus.textContent='目前係本機檔案。請先部署整個資料夾，或手動貼上部署後嘅 HTTPS counter.js 網址。';
+      }
+    }catch{}
+    document.getElementById('apply').onclick=applyUrl;
+    input.addEventListener('change',applyUrl);
+    bookmark.addEventListener('click',event=>{
+      event.preventDefault();
+      alert(currentBookmarklet?'請將綠色按鈕拖到收藏夾列，或下載收藏夾匯入檔。':'請先套用有效嘅 HTTPS counter.js 網址。');
+    });
+    copy.onclick=async()=>{
+      if(!currentBookmarklet)return;
+      code.focus();code.select();
+      try{await navigator.clipboard.writeText(currentBookmarklet);message.textContent='已複製完整收藏夾網址。'}
+      catch{message.textContent='內容已選取，請按 Ctrl + C 複製。'}
+    };
+    download.onclick=()=>{
+      if(!currentBookmarklet)return;
+      const escaped=currentBookmarklet.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+      const html='<!DOCTYPE NETSCAPE-Bookmark-file-1><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><TITLE>Bookmarks</TITLE><H1>Bookmarks</H1><DL><p><DT><A HREF="'+escaped+'">OWNDAYS 統計－外部版</A></DL><p>';
+      const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+      const a=document.createElement('a');a.href=url;a.download='OWNDAYS-external-counter-bookmark.html';a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    };
+  </script>
+</body>
+</html>
